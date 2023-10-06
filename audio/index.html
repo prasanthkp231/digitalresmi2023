@@ -1,0 +1,157 @@
+
+
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+<style>
+
+#canvas {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 95%;
+  z-index:-1;
+}
+
+#control-content {
+  width:100%;
+  display:none;
+  position:fixed;
+  bottom:0;
+}
+#controls:hover #control-content{
+	display:block;
+}
+#controls{
+	position:fixed;
+	width:100%;
+	background:#aaa;
+	height:10px;
+	bottom:0px;
+	left:0px;
+}
+audio{
+	width:100%;
+}
+#name{
+	color:rgb(255,255,0);
+	text-align:center;
+	margin-top:50px;
+	font-family: Arial;
+	font-size: 50px;
+}
+body{
+	background:#000;
+}
+</style>
+
+  <script>
+  window.console = window.console || function(t) {};
+</script>
+
+  
+  
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
+
+
+</head>
+
+<body translate="no" >
+  <div id="content">
+  <h1 id="name"></h1>
+  <canvas id="canvas"></canvas>
+<div id="controls">
+<div id="control-content">
+  <audio id="audio" controls></audio>
+  <div style="padding-left:30px">
+  <button onclick="play_file('Suma C R','suma.mp4')">Suma C R</button>
+  <button onclick="play_file('Biju Joseph Pawath','biju.mp4')">Biju Joseph Pawath</button>
+  <button onclick="play_file('Neetha Thomas','neetha.mp4')">Neetha Thomas</button>
+  <button onclick="play_file('Prabhukumar P B','prabhu.ogg')">Prabhukumar P B</button>
+  <button onclick="play_file('Mobby Mathew Panicker','mobby.aac')">Mobby Mathew Panicker</button>
+  <button onclick="play_file('Vijayakumar K K','vijay.mp3')">Vijayakumar K K</button>
+  <button onclick="play_file('Zareena Beegam R','zareena.mp4')">Zareena Beegam R</button>
+  </div>
+</div>
+</div>
+</div>
+  
+      <script id="rendered-js" >
+window.onload = function () {
+
+  var audio = document.getElementById("audio");
+};
+  function play_file(name,fname) {
+	document.getElementById('name').innerHTML=name;
+    var files = this.files;
+    audio.src = fname;
+    audio.load();
+    audio.play();
+    var context = new AudioContext();
+    var src = context.createMediaElementSource(audio);
+    var analyser = context.createAnalyser();
+
+    var canvas = document.getElementById("canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    var ctx = canvas.getContext("2d");
+
+    src.connect(analyser);
+    analyser.connect(context.destination);
+
+    analyser.fftSize = 256;
+
+    var bufferLength = analyser.frequencyBinCount;
+    console.log(bufferLength);
+
+    var dataArray = new Uint8Array(bufferLength);
+
+    var WIDTH = canvas.width;
+    var HEIGHT = canvas.height;
+
+    var barWidth = WIDTH / bufferLength * 2.5;
+    var barHeight;
+    var x = 0;
+
+    function renderFrame() {
+      requestAnimationFrame(renderFrame);
+
+      x = 0;
+
+      analyser.getByteFrequencyData(dataArray);
+
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      for (var i = 0; i < bufferLength; i++) {
+        barHeight = dataArray[i]*1.8;
+
+        var r = barHeight + 25 * (i / bufferLength);
+        var g = 250 * (i / bufferLength);
+        var b = 50;
+
+        ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+        ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
+
+        x += barWidth + 1;
+      }
+    }
+
+    audio.play();
+    renderFrame();
+  }
+//# sourceURL=pen.js
+    </script>
+
+  
+
+</body>
+
+</html>
+ 
